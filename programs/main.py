@@ -84,7 +84,7 @@ def main():
     index = 0
     while True:
         raw_files = os.listdir()
-        raw_files = removeItems([".idea", "__pycache__", "crile files & folders"], raw_files)
+        raw_files = removeItems([".idea", "__pycache__", "crile-files"], raw_files)
         raw_files = repositionItemInList(0, "main.py", raw_files)
 
         selected = raw_files[index]
