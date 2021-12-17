@@ -1,25 +1,8 @@
 from _resource import *
 import os
 
-__doc__ = """
------ HELP -----
-[COMMANDS]:
-    - cd <file name>
-    - view <file name>
-
-[CD COMMAND]:
-    Navigates you to the specified file name, if it does not exist
-    it leaves you at the file already selected.
-
-[VIEW COMMAND]:
-    Prints the doc of the file currently selected, which explains what the file does
-    and how to use the file.
-
-[SOURCE CODE CONCERNS]:
-    If you are wondering why the source code for the files seems to be more complicated
-    then it should be. It would be due to the fact that all files in the "branchless-program"
-    file are, well branchless. None of the files here SHOULD contain if statements.
-"""
+with open("../documentation/help-doc.txt", "r") as DOC_FILE:
+    __doc__ = DOC_FILE.read()
 
 __DIVIDER = "-----------------------"
 
@@ -84,7 +67,7 @@ def main():
     index = 0
     while True:
         raw_files = os.listdir()
-        raw_files = removeItems([".idea", "__pycache__", "crile files & folders"], raw_files)
+        raw_files = removeNonePyExtensions(raw_files)
         raw_files = repositionItemInList(0, "main.py", raw_files)
 
         selected = raw_files[index]
@@ -98,14 +81,16 @@ def main():
         cmd = input("Execute Command: ")
 
         try:
-            destructed = help_conditional[(cmd == "help")+0]()
+            destructed = help_conditional[(cmd == "help") + 0]()
             index = destructed["index"]
             cmd = destructed["cmd"]
-        except KeyError:
-            try: index = rotate_conditional[(cmd.split(" ")[0] == "cd") + 0](cmd, raw_files, index)
-            except KeyError:
-                try: view_conditional[(cmd.split(" ")[0] == "view") + 0](cmd, raw_files, index)
-                except KeyError: continue
+        except KeyError: pass
+        
+        try: index = rotate_conditional[(cmd.split(" ")[0] == "cd") + 0](cmd, raw_files, index)
+        except KeyError: pass
+        
+        try: view_conditional[(cmd.split(" ")[0] == "view") + 0](cmd, raw_files, index)
+        except KeyError: pass
 
 
 if __name__ == "__main__":

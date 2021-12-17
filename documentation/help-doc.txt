@@ -1,0 +1,16 @@
+[COMMANDS]:
+    - cd <file name>
+    - view <file name>
+
+[CD COMMAND]:
+    Navigates you to the specified file name, if it does not exist
+    it leaves you at the file already selected.
+
+[VIEW COMMAND]:
+    Prints the doc of the file currently selected, which explains what the file does
+    and how to use the file.
+
+[SOURCE CODE CONCERNS]:
+    If you are wondering why the source code for the files seems to be more complicated
+    then it should be. It would be due to the fact that all files in the "branchless-program"
+    file are, well branchless. None of the files here SHOULD contain if statements.

@@ -1,0 +1,35 @@
+tokenize.py is a file that is used for creating a list
+of tokens from a specified file.
+
+The tokenize.py file can either be ran in the terminal
+or could be used as an import to save all tokens created
+to a variable.
+
+[KEY]:
+    - * # Optional
+    - <> # Fill in
+
+[RUNNING IN TERMINAL (PRINT)]: 
+    # Prints all tokens to the terminal in the format TOKEN(<type>, <value>)
+    Run: python tokenize.py <file> print
+    Ex:
+        python tokenize.py myFile.txt print
+
+[RUNNING IN TERMINAL (SAVING)]:
+    # Saves all tokens to a specified file
+    # new lines just saves the tokens each in a new line (Default is False)
+    Run: python tokenize.py <file> save <file> <*new lines>
+    Ex:
+        python tokenize.py myFile.txt save saveFile.txt True
+        python tokenize.py myFile.txt save saveFile.txt
+
+[RUNNING IN PYTHON SCRIPTS]:
+    import tokenize
+    from tokenize import get_tokens
+    from tokenize import *
+    
+    Run: tokenize.get_tokens(<file>)
+    Ex: myVar = tokenize.get_tokens("myFile.txt")
+    
+[FUTURE POSSIBLE FEATURES]:
+    - Custom Token Types

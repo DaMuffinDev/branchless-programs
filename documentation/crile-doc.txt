@@ -1,0 +1,119 @@
+Crile is a branch less python file that allows you to create new files and folders
+with the name and directory/path that you choose.
+
+Using the "." for the path argument will set it in the current directory
+
+[KEY]:
+    * - Optional
+    <> - User input
+
+[CREATING FOLDERS]:
+    Run: python crile.py folder <name> <*path>
+    Ex:
+        python crile.py folder testFolder
+        python crile.py folder testFolder .
+    Json: {
+        "type": "folder",
+        "path": "crile-files",
+        "name": "myFolder"
+    }
+
+[CREATING FILES]:
+    Run: python crile.py py <name> <*path>
+    Ex:
+        python crile.py py test
+        python crile.py py test testFolder
+    Json: {
+        "type": "py",
+        "path": "crile-files/myFolder",
+        "name": "myFile"
+    }
+
+[COPYING FILES]:
+    # The "copy" command allows you to take the contents
+    # of one file and paste it into another.
+    # You can either create a new file or use
+    # an existing file to copy those contents into.
+    Run: python crile.py copy <file to copy> <file to copys path> <file to copy to> <file to copy to's path>
+    Ex:
+        python crile.py copy myFile.py crile-files copyFile.py crile-FILES
+        python crile.py copy crile.py . crileCopy.py crile-files
+    Json: {
+        "type": "copy",
+        "path": ".",
+        "name": "crile.py",
+        "new_path": "crile-files/myFolder",
+        "new_name": "myFile.py"
+    }
+
+[DELETING FILES & FOLDERS]:
+    Run: python crile.py delete <name> <path> <type>
+    Ex: 
+        python crile.py delete testFile.py . file
+        python crile.py delete testFolder . folder
+    Json: {
+        "type": "delete",
+        "path": "crile-files",
+        "name": "deleteMe",
+        "delete_type": "folder"
+    }
+
+[WIPING FILES]:
+    # The path should always contain the path to the
+    # directory you want to destory.
+    Run: python crile.py wipe <path>
+    Ex:
+        python crile.py wipe crile-files
+        python crile.py wipe .
+    Json: {
+        "type": "wipe",
+        "path": "crile-files/myFolder"
+    }
+
+[RESTORE DEFAULT FILES]:
+    Run: python crile.py restore <path>
+    Ex:
+        python crile.py restore .
+        python crile.py restore testFolder
+    Json: {
+        "type": "restore",
+        "path": "."
+    }
+
+[JSON DOCUMENTATION]:
+    Crile.py is able to support running crile commands
+    from a json file.
+
+    [SETUP]:
+        # The path is for the directory that will be storing
+        # all crile json files. It there is an unspecified path
+        # it will default to the same directory as the crile.py file.
+        Run: python crile.py setup-json <json file name> <*path>
+        Ex:
+            python crile.py setup-json crile-run crile-files
+            python crile.py setup-json crile-run
+    
+    [RUNNING CRILE JSON FILES]:
+        Run: python crile.py run-json <crile json path>
+        Ex:
+            python crile.py run-json crile-jsons/crile-run.json
+            python crile.py run-json crile-files/crile-jsons/crile-run.json
+    
+    [CREATING JSON]:
+        After seting up your crile json files navigate to there location,
+        and open them up. By defualt you should see "@crile-compiler": [].
+        Inside of the [] you can type commands.
+
+        Each command has a json section that says how to create the json
+        form of that specific command.
+
+        Ex: {
+            "type": <type>,
+            "path": <path>,
+            "name": <name>
+        }
+
+        The "type" attribute is always required in order to run
+        crile commands.
+
+If no path is specified it will be defaulted to the "crile-files" folder.

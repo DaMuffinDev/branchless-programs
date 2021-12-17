@@ -1,35 +1,8 @@
 import random
 
 
-__doc__ = """
-Bamble is a fun game you can play that allows you
-to spend a currency called bamble bucks.
-
-You have a 50/50 shot of winning or losing.
-When you start the program you will by default
-have 300 bamble bucks that you can use for voting.
-
-[HOW TO PLAY]:
-    It will first ask you how many bamble bucks you would
-    like to vote. The minimum being 100 and the maximum being
-    the amount of bamble bucks you already have.
-
-    Once you finish entering the amount of bamble bucks to
-    vote on the game. You then will either type 0 for heads, or 
-    1 for tails. Then press enter to continue.
-
-    After you typed the necessary data for the game, you will either
-    gain the amount of bamble bucks entered or lose it. Once your
-    bamble bucks hit 0, the program will stop.
-
-[HOW TO START]:
-    Run: python bamble.py
-
-[MISSING FEATURES]:
-    - Total Losses
-    - Win Streak
-    - Loss Streak
-"""
+with open("../documentation/bamble-doc.txt", "r") as DOC_FILE:
+    __doc__ = DOC_FILE.read()
 
 
 class GameEngine:
