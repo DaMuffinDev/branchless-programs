@@ -63,6 +63,7 @@ def main():
     rotate_conditional = {1: rotate}
     view_conditional = {1: view}
     help_conditional = {1: (lambda: {'index': 0, 'cmd': "view main.py"})}
+    exit_conditional = {1: (lambda: 0)}
 
     index = 0
     while True:
@@ -90,6 +91,11 @@ def main():
         except KeyError: pass
         
         try: view_conditional[(cmd.split(" ")[0] == "view") + 0](cmd, raw_files, index)
+        except KeyError: pass
+
+        try: 
+            exit_conditional[(cmd == "exit") + (cmd == "1" or cmd == 1) + 0]()
+            break
         except KeyError: pass
 
 

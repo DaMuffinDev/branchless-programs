@@ -1,0 +1,51 @@
+{
+    "@crile-compiler": [
+        {
+            "@settings": {
+                "safe-run": true,
+                "run-time": 0.01,
+                "print-cmds": true
+            }
+        },
+        {
+            "type": "restore",
+            "path": "."
+        },
+        {
+            "type": "folder",
+            "path": "crile-files",
+            "name": "spam"
+        },
+        {
+            "type": "folder",
+            "path": "crile-files/spam",
+            "name": "compute"
+        },
+        {
+            "type": "py",
+            "path": "crile-files/spam/compute",
+            "name": "spam-handler"
+        },
+        {
+            "type": "folder",
+            "path": "crile-files/spam",
+            "name": "spam-mail"
+        },
+        {
+            "type": "folder",
+            "path": "crile-files/spam/spam-mail",
+            "name": "memory-leaks"
+        },
+        {
+            "type": "copy",
+            "path": "crile-files",
+            "name": "spam-handler-new.py",
+            "new_path": "crile-files/spam/compute",
+            "new_name": "spam-handler.py"
+        },
+        {
+            "type": "wipe",
+            "path": "crile-files/spam/spam-mail"
+        }
+    ]
+}

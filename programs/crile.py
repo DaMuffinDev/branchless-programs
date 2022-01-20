@@ -1,7 +1,7 @@
 import sys
 import os
-import shutil
 import json
+import time
 
 
 with open("../documentation/crile-doc.txt", "r") as DOC_FILE:
@@ -11,7 +11,13 @@ with open("../documentation/crile-doc.txt", "r") as DOC_FILE:
 __DEFAULT_CRILE_JSON = \
 """{
     "@crile-compiler": [
-
+        {
+            "@settings": {
+                "safe-run": true,
+                "run-time": 0.05,
+                "print-cmds": true
+            }
+        }
     ]
 }
 """
@@ -22,22 +28,30 @@ def __call_keyError():
 
 
 def __setup_json(name, path):
+    __DEFAULT_FILE = "crile-jsons"
+
     does_directory_exists_conditional = {1: (lambda path: os.path.join(os.getcwd(), path))}
     does_file_exist_conditional = {1: (lambda: 0)}
-    replace_file_conditional = {0: (lambda: 0),1: __call_keyError}
+    replace_file_conditional = {0: (lambda: 0), 1: __call_keyError}
     valid_replace_conditional = {0: (lambda: 0), 1: (lambda: 1)}
 
     try: path = does_directory_exists_conditional[(path is not None) + 0](path)
     except KeyError: path = os.getcwd()
 
     os.chdir(path)
-    try: does_directory_exists_conditional[(path is not None) + 0]("crile-jsons")
-    except KeyError: os.makedirs("crile-jsons")
+    try: full_path = does_directory_exists_conditional[(path is not None) * (os.path.exists(
+        os.path.join(
+            os.path.join(
+                os.getcwd(), path), __DEFAULT_FILE))) + 0](__DEFAULT_FILE)
+    except KeyError: 
+        os.makedirs(__DEFAULT_FILE)
+        full_path = os.path.join(os.getcwd(), __DEFAULT_FILE)
 
-    os.chdir(os.path.join(path, "crile-jsons"))
-    does_file_exist = os.path.exists(os.path.join(os.path.join(path, "crile-jsons"), name))
+    os.chdir(os.path.join(path, __DEFAULT_FILE))
+    does_file_exist = os.path.exists(os.path.join(full_path, f"{name}.json"))
+
     try: 
-        does_file_exist_conditional[(not does_file_exist) + 0]()
+        does_file_exist_conditional[(does_file_exist) + 0]()
         print(f"The file \"{name}.json\" already exists. Would you like to replace it?")
         should_replace = input(f"Y(1), N(0): ")
 
@@ -52,7 +66,11 @@ def __setup_json(name, path):
             new_json.write(__DEFAULT_CRILE_JSON)
 
 
-def __json(json_file):
+def __run_json(json_file):
+    os.chdir(os.getcwd())
+
+    json_setting_conditional = {1: (lambda: 0)}
+
     json_type_conditional = {1: (lambda _type: f" {_type}")}
     json_path_conditional = {1: (lambda path: f" {path}")}
     json_name_conditional = {1: (lambda name: f" {name}")}
@@ -65,32 +83,47 @@ def __json(json_file):
     
     commands = []
     json_comp = json_data["@crile-compiler"]
+    setting_data = {}
     
     for cmd in json_comp:
-        command_template = "python crile.py"
+        try: 
+            json_setting_conditional["@settings" in cmd]()
+            setting_data = cmd
+        except KeyError:
+            command_template = "python crile.py"
 
-        try: command_template += json_type_conditional[("type" in cmd) + 0](cmd["type"])
-        except KeyError: pass
+            try: command_template += json_type_conditional[("type" in cmd) + 0](cmd["type"])
+            except KeyError: pass
 
-        try: command_template += json_name_conditional[("name" in cmd) + 0](cmd["name"])
-        except KeyError: pass
-        
-        try: command_template += json_path_conditional[("path" in cmd) + 0](cmd["path"])
-        except KeyError: pass
+            try: command_template += json_name_conditional[("name" in cmd) + 0](cmd["name"])
+            except KeyError: pass
+            
+            try: command_template += json_path_conditional[("path" in cmd) + 0](cmd["path"])
+            except KeyError: pass
 
-        try: command_template += json_new_name_conditional[("new_name" in cmd) + 0](cmd["new_name"])
-        except KeyError: pass
+            try: command_template += json_new_name_conditional[("new_name" in cmd) + 0](cmd["new_name"])
+            except KeyError: pass
 
-        try: command_template += json_new_path_conditional[("new_path" in cmd) + 0](cmd["new_path"])
-        except KeyError: pass
+            try: command_template += json_new_path_conditional[("new_path" in cmd) + 0](cmd["new_path"])
+            except KeyError: pass
 
-        try: command_template += json_delete_type_conditional[("delete_type" in cmd) + 0](cmd["delete_type"])
-        except KeyError: pass
-        
-        commands.append(command_template)
+            try: command_template += json_delete_type_conditional[("delete_type" in cmd) + 0](cmd["delete_type"])
+            except KeyError: pass
+            
+            commands.append(command_template)
 
+    safe_run_conditional = {1: (lambda: 0)}
+    print_run_conditional = {1: (lambda: 0)}
+    setting_data = setting_data["@settings"]
     for runnable_cmd in commands:
-        print(runnable_cmd)
+        try:
+            print_run_conditional[("print-cmds" in setting_data) + 0]() 
+            print(runnable_cmd)
+        except KeyError: pass
+        try:
+            safe_run_conditional[("safe-run" in setting_data) + 0]()
+            time.sleep(setting_data["run-time"])
+        except KeyError: pass
         os.system(runnable_cmd)
 
 
@@ -108,14 +141,27 @@ def __delete_dir(file_data):
 
 
 def __delete(file_name, path, object_type):
-    object_conditional = {0: __delete_dir, 1: __delete_file}
+    delete_file_conditional = {1: __delete_file}
+    delete_directory_conditional = {2: __delete_dir}
     object_path = os.path.join(os.getcwd(), path)
-    object_conditional[(object_type == "file")]({"name": file_name, "path": os.path.join(object_path, file_name)})
+    delete_data = {"name": file_name, "path": object_path}
+    try:
+        delete_file_conditional[(object_type == "file") + 0](delete_data)
+        return
+    except KeyError: pass
+    try: 
+        delete_directory_conditional[(object_type == "folder") + 0](delete_data)
+        return
+    except KeyError: pass
+
+    print(f"[ERROR]: Cannot delete \"{file_name}\"; An unknown error occured.")
+    sys.exit(1)
 
 
 def __wipe_files(path):
     folder_path = os.path.join(os.getcwd(), path)
-    input(f"[WARNING]: Your about to wipe all files in the directory: \"{folder_path}\"; \nPress Enter to Continue...")
+    try: input(f"[WARNING]: You're about to wipe all files in the directory: \"{folder_path}\"; \nPress Enter to Continue OR (CTRL+C) to cancel...")
+    except KeyboardInterrupt: print("\nOperation Aborted.\n")
     shutil.rmtree(folder_path)
 
 
@@ -133,19 +179,18 @@ def __create_folder(folder_name, path):
 def __copy_file_data(file, path):
     os.chdir(path)
     with open(file, "r") as f:
-        return f.read()
+        contents = f.read()
+    return contents
 
 
-def __copy(file, path, name, new_file_path):
+def __copy(file, path, new_file, new_file_path):
+    old_file_path = os.path.join(os.getcwd(), path)
+
     does_directory_exist_conditional = {1: (lambda directory: print(f"[ERROR]: Directory \"{directory}\" does not exist!"))}
-    is_new_path_conditional = {1: (lambda: os.path.join(os.getcwd(), new_file_path))}
+    is_new_path_conditional = {0: (lambda: old_file_path), 1: (lambda: os.path.join(os.getcwd(), new_file_path))}
     does_file_exist_conditional = {1: __create_file}
 
-    old_file_path = os.path.join(os.getcwd(), path)
-    new_file_path = os.path.join(os.getcwd(), new_file_path)
-
-    try: is_new_path_conditional[(not new_file_path == old_file_path) + 0]()
-    except KeyError: new_file_path = old_file_path
+    new_file_path = is_new_path_conditional[(not new_file_path == old_file_path) + 0]()
 
     try:
         does_directory_exist_conditional[not os.path.exists(old_file_path) + 0](old_file_path)
@@ -153,14 +198,13 @@ def __copy(file, path, name, new_file_path):
         sys.exit(1)
     except KeyError: pass
 
-    os.chdir(old_file_path)
-    file_data = __copy_file_data(file, path)
+    file_data = __copy_file_data(file, old_file_path)
 
     os.chdir(new_file_path)
-    try: does_file_exist_conditional[(not os.path.exists(new_file_path)) + 0](name, new_file_path)
+    try: does_file_exist_conditional[(not os.path.exists(new_file_path)) + 0](new_file, new_file_path)
     except KeyError: pass
 
-    with open(name, "w") as new_file:
+    with open(new_file, "w") as new_file:
         new_file.write(file_data)
 
 
@@ -180,8 +224,10 @@ def __create_file(file_name, path):
 
 
 def __call_restore(path):
+    does_directory_exist_conditional = {1: (lambda: 0)}
     os.chdir(path)
-    os.makedirs("crile-files")
+    try: does_directory_exist_conditional[(os.path.exists(path)) + 0]()
+    except KeyError: os.makedirs("crile-files")
 
 
 def __restore(path):
@@ -200,7 +246,7 @@ def main():
     delete_conditional = {1: __delete}
     restore_conditional = {1: __restore}
     copy_conditional = {1: __copy}
-    json_conditional = {1: __json}
+    json_run_conditional = {1: __run_json}
     json_setup_conditional = {1: __setup_json}
 
     create_option = sys.argv[1]
@@ -224,19 +270,26 @@ def main():
     except KeyError: pass
 
     try: delete_conditional[(create_option == "delete") + 0](sys.argv[2], sys.argv[3], sys.argv[4])
-    except KeyError: pass
+    except Exception as e:
+        index_error_conditional = {1: (lambda: print("[ERROR]: Delete function missing arguments..."))}
+        try: index_error_conditional[(e.__class__.__name__ == "IndexError") + 0]()
+        except KeyError: pass
     
     try: restore_conditional[(create_option == "restore") + 0](sys.argv[2])
     except KeyError: pass
 
     try: copy_conditional[(create_option == "copy") + 0](sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
-    except KeyError: pass
+    except Exception as e:
+        index_error_conditional = {1: (lambda: print("[ERROR]: Copy function missing arguments..."))}
+        try: index_error_conditional[(e.__class__.__name__ == "IndexError") + 0]()
+        except KeyError: pass
 
-    try: json_conditional[(create_option == "run-json") + 0](sys.argv[2])
+    try: json_run_conditional[(create_option == "run-json") + 0](sys.argv[2])
     except KeyError: pass
 
     try: json_setup_conditional[(create_option == "setup-json") + 0](sys.argv[2], optional_arg3)
     except KeyError: pass
+
 
 if __name__ == "__main__":
     main()
