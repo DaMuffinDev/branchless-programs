@@ -1,2 +1,2 @@
 # branchless-programs
-This GitHub repository contains files that contain no "if" statements.
+This GitHub repository contains files that have no "if" statements.
